@@ -115,3 +115,37 @@ proceed:
     mv a0, t4
     mv a1, t5
     jr ra
+
+
+.text
+.global concatRope
+concatRope:
+    # a0 = address of the first rope, a1 = address of the second rope
+
+    # Load rLen and rLeft of the first rope
+    ld t2, 0(a0)       # Load rLen of the first rope into t2
+    ld t3, 8(a0)       # Load rLeft of the first rope into t3
+
+    # Load rLen and rRight of the second rope
+    ld t4, 0(a1)       # Load rLen of the second rope into t4
+    ld t5, 8(a1)       # Load rRight of the second rope into t5
+
+    # Allocate memory for the new rope
+    li a7, 9           # syscall number for sbrk
+    li a0, 24          # size of the rope structure
+    ecall
+    mv t6, a0          # t6 = address of the new rope
+
+    # Calculate new rLen for the concatenated rope
+    add x1, t2, t4     # x1 = rLen of the concatenated rope
+    sd x1, 0(t6)       # Set rLen of the new rope
+
+    # Set rLeft and rRight of the new rope
+    sd t3, 8(t6)       # Set rLeft of the new rope
+    sd t5, 16(t6)      # Set rRight of the new rope
+	
+    # Return the address of the concatenated rope
+    mv a0, t6
+    
+    jr ra
+
